@@ -1,0 +1,207 @@
+name: Publish frp Docker image
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  frp:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set variables
+        run: |
+          VER=$(cat ./frp/VERSION)
+          echo "VERSION=$VER" >> $GITHUB_ENV
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: yanickxia/frp
+
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        with:
+          context: .
+          file: ./frp/Dockerfile
+          push: true
+          build-args: |
+            FRP_VERSION=${{ env.VERSION }}
+          tags: |
+            yanickxia/frp:${{ env.VERSION }}
+            yanickxia/frp:latest
+      - name: Update repo description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: yanickxia/frp
+  gost:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set variables
+        run: |
+          VER=$(cat ./gost/VERSION)
+          echo "VERSION=$VER" >> $GITHUB_ENV
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: yanickxia/gost
+
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        with:
+          context: ./gost/
+          file: ./gost/Dockerfile
+          push: true
+          build-args: |
+            GOST_VERSION=${{ env.VERSION }}
+          tags: |
+            yanickxia/gost:${{ env.VERSION }}
+            yanickxia/gost:latest
+      - name: Update repo description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: yanickxia/gost
+  kcptun:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set variables
+        run: |
+          VER=$(cat ./kcptun/VERSION)
+          echo "VERSION=$VER" >> $GITHUB_ENV
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: yanickxia/kcptun
+
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        with:
+          context: ./kcptun/
+          file: ./kcptun/Dockerfile
+          push: true
+          build-args: |
+            KCPGTUN_VERSION=${{ env.VERSION }}
+          tags: |
+            yanickxia/kcptun:${{ env.VERSION }}
+            yanickxia/kcptun:latest
+      - name: Update repo description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: yanickxia/kcptun
+  shadowsocks:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set variables
+        run: |
+          VER=$(cat ./shadowsocks/VERSION)
+          echo "VERSION=$VER" >> $GITHUB_ENV
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: yanickxia/shadowsocks
+
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        with:
+          context: ./shadowsocks/
+          file: ./shadowsocks/Dockerfile
+          push: true
+          build-args: |
+            SHADOWSOCKS_VERSION=${{ env.VERSION }}
+          tags: |
+            yanickxia/shadowsocks:${{ env.VERSION }}
+            yanickxia/shadowsocks:latest
+      - name: Update repo description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: yanickxia/shadowsocks
+  sync:
+    name: "sync image to ali"
+    runs-on: ubuntu-latest
+    needs: ["shadowsocks", "kcptun", "gost", "frp"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: hhyasdf/image-sync-action@v1.1
+        with:
+          auth_file: ./sync/auth.yaml
+          images_file: ./sync/images.yaml
+          proc: 6
+        env:
+          ALI_PASSWORD: ${{ secrets.ALI_PASSWORD }}
+          ALI_USERNAME: ${{ secrets.ALI_USERNAME }}
