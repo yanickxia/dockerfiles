@@ -1,4 +1,4 @@
-name: Publish frp Docker image
+name: Publish Docker image
 
 on:
   push:
